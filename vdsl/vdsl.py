@@ -45,7 +45,7 @@ class protein(mol):
             save_path = None,
             target_sites = None,
             exhaustiveness = 8):
-        if target_sites == None:
+        if target_sites is None:
             target_sites = self.key_sites
         results = vina.dock(self.struc,
                     smiles,
@@ -61,7 +61,9 @@ class pdb_fns:
         atoms = structure.df['ATOM'].copy()
         hetatms = structure.df['HETATM'].copy()
         atoms = atoms.loc[atoms['chain_id'] == chain_selection,:]
-        hetatms = hetatms.loc[hetatms['chain_id'] == chain_selection,:]
+        # edge case - het atoms didnt have chain assigned (single chain struc - 3iw2)
+        if chain_selection in hetatms['chain_id']:
+            hetatms = hetatms.loc[hetatms['chain_id'] == chain_selection,:]
         het_garbage = [i for i in hetatms['residue_name'].unique() if i not in keep]
         hetatms = hetatms.loc[hetatms['residue_name'].isin(het_garbage) == False,:]
         structure.df['ATOM'] = atoms
@@ -131,8 +133,8 @@ class vina:
         CACHE = tempfile.mkdtemp()
         raw_vina_results = os.path.join(CACHE, 'vina.result')
         # todo : if not clean  - check if dock from protein object
-        clean_receptor_pdb = pdb_fns.clean_pdb(receptor_pdb, os.path.join(CACHE, f'{os.path.basename(receptor_pdb)}.clean'),
-                                                                            keep = keep)
+        # otherwise this executes twice
+        clean_receptor_pdb = pdb_fns.clean_pdb(receptor_pdb, os.path.join(CACHE, f'{os.path.basename(receptor_pdb)}.clean'), keep = keep)
         receptor_pdbqt = obabel_fns.pdb_to_pdbqt(clean_receptor_pdb, os.path.join(CACHE,'receptor.pdbqt'))
         ligand_pdbqt = obabel_fns.smiles_to_pdbqt(smiles, os.path.join(CACHE,'ligand.pdbqt'))
         args = {'--receptor':receptor_pdbqt,
