@@ -56,9 +56,16 @@ class protein(mol):
         return results
 
 class pdb_fns:
-    def clean_pdb(struc, save_path, keep = [], chain_selection = 'A'):
+    def clean_pdb(struc, save_path, keep = [], chain_selection = None):
         structure = PandasPdb().read_pdb(struc)
         atoms = structure.df['ATOM'].copy()
+
+        # added 20210423 - there were chain selection problems
+        chains = atoms['chain_id'].unique()
+        if chain_selection is None:
+            chain_selection = chains[0]
+        #### 
+
         hetatms = structure.df['HETATM'].copy()
         atoms = atoms.loc[atoms['chain_id'] == chain_selection,:]
         # edge case - het atoms didnt have chain assigned (single chain struc - 3iw2)
@@ -75,6 +82,7 @@ class pdb_fns:
         structure = PandasPdb().read_pdb(struc)
         sequences = structure.amino3to1() # cols = ['chain_id', 'residue_name']
         seqs = [''.join(sequences.loc[sequences['chain_id'] == i,'residue_name'].to_list()) for i in sequences['chain_id'].unique()]
+        
         return seqs[0] if len(seqs) == 1 else seqs
 
     def draw_box(struc, key_sites):
