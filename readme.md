@@ -56,3 +56,17 @@ results.save('thatwaseasy')
 
 pritn(results.scores) # pd.DataFrame
 ```
+
+# installation
+
+**warning** I've only tested this using `conda` - your best bet is to clone the environment in `env.yml` and `pip` install. I had issues with the different versions of `openbabel` in the past so it's potentially risky business to roll your own installation.
+
+**another warning** I've also only tested this on linux distros (ubuntu, debian, arch) - let me know if something weird happens
+
+- clone the repository: `git clone https://github.com/UoMMIB/vina-diesel.git`
+- move in `cd vina-diesel`
+- clone the environment with conda `conda env create -f env.yml`
+- ACTIVATE `conda activate vdsl`
+- install `pip install .` (from the root with `setup.py`)
+
+done. test with `test/test.py` if you like
